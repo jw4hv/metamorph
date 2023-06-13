@@ -1,0 +1,26 @@
+study:
+        name: 'prototype'
+
+data:
+    predict: '2D'
+    x: 240
+    y: 240
+    z: 1
+
+model:
+    network_type: 'CNN'
+    pooling: 'AverageROI'
+    num_outputs: 3
+    num_blocks: 2
+    optimizer: 'Adam'
+    scheduler: 'CosAn'
+    loss: 'L2'    ##'L2' or 'L1'
+    augmentation: False
+    image_grad: False
+    kernel_K: False
+
+solver:
+    lr: 0.001
+    epochs: 2
+    batch_size: 4
+    weight_decay: 0.0001
