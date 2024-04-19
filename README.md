@@ -47,7 +47,7 @@ To run training, simply execute the script Train_MetaMorph.py.
 
 ## Documentation
 - The region-based mutual information paper (https://papers.nips.cc/paper_files/paper/2019/hash/a67c8c9a961b4182688768dd9ba015fe-Abstract.html), Region mutual information loss for semantic segmentation. Advances in Neural Information Processing Systems, 2019.
-- Different shooting models we have included are, Stationary Velocity Field in Voxelmorph (Paper: https://arxiv.org/abs/1809.05231, Code: https://github.com/voxelmorph/voxelmorph); Vector-Momenta Shooting Method in Lagomorph (Paper: https://openreview.net/pdf?id=Hkg0j9sA1V, Code: https://github.com/jacobhinkle/lagomorph); LDDMM-based on Fourier representations (https://bitbucket.org/FlashC/flashc/src).
+- Different shooting models we have included are, Stationary Velocity Field in Voxelmorph (Paper: https://arxiv.org/abs/1809.05231, Code: https://github.com/voxelmorph/voxelmorph); Vector-Momenta Shooting Method in Lagomorph (Paper: https://openreview.net/pdf?id=Hkg0j9sA1V, Code: https://github.com/jacobhinkle/lagomorph); LDDMM by Fourier representations (https://bitbucket.org/FlashC/flashc/src).
 
 ## Contributing
 We are seeking collaboration opportunities to explore uncertainty quantification along tumor boundaries and related areas. If interested, please reach out to contribute or discuss further. 
