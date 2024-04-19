@@ -17,7 +17,7 @@ We updated the most recent version of joint learning of MetaMorph. Note that we 
 
 ## Introduction
 
-Here is a overview of our entire model. Image segmentation: i). We first input a pair of images into a segmentation network, and apply predicted labels onto images to mask out the appearance change. Image registration: ii). We then input a pair of images (with masked-out appearance change) to the registration network and predict a piecewise velocity field, integrate geodesic constraints, and produce a deformed image and transformation-propagated segmentation. The deformed images and labels are circulated into the segmentation network as augmented data (more advanced augmentation strategies will be served as optional choices). We adopt jointly learning for both models. 
+Here is a overview of our entire model. Image segmentation: i). We first input a pair of images into a segmentation network, and apply predicted labels onto images to mask out the appearance change. Image registration: ii). We then input a pair of images (with masked-out appearance change) to the registration network and predict a piecewise velocity field, integrate geodesic constraints, and produce a deformed image and transformation-propagated segmentation. The deformed images and labels are circulated into the segmentation network as augmented data (more advanced augmentation strategies will be served as optional choices). We adopt joint learning for both models. 
 
 ## Installation
 
