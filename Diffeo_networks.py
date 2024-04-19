@@ -229,7 +229,7 @@ class DiffeoDense(LoadableModel):
         # configure transformer
         self.transformer = SpatialTransformer(inshape)
 
-    def forward(self, source, target, original_src, binary_map, registration=False, svf = False):
+    def forward(self, source, target, original_src, binary_map, registration=False, shooting = None):
 
         # concatenate inputs and propagate unet
         x = torch.cat([source, target], dim=1)
@@ -248,7 +248,7 @@ class DiffeoDense(LoadableModel):
         neg_flow = -pos_flow if self.bidir else None
 
         # integrate to produce diffeomorphic warp
-        if (svf == True):
+        if (shooting == "svf"):
             if self.integrate:
                 pos_flow = self.integrate(pos_flow)
                 neg_flow = self.integrate(neg_flow) if self.bidir else None

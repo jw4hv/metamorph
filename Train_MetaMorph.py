@@ -21,7 +21,7 @@ from Diffeo_networks import *
 from Seg_networks import *
 from SitkDataSet import SitkDataset as SData
 from uEpdiff import *
-
+import lagomorph as lm 
 ################### Utility Functions ###################
 
 def get_device():
@@ -89,10 +89,12 @@ def initialize_network_optimizer(xDim, yDim, zDim, para, dev):
 
     return net, net_seg, criterion, optimizer
 
-def train_network(trainloader, net, net_seg, para, criterion, optimizer, DistType, RegularityType, weight_dist, weight_reg,  reduced_xDim, reduced_yDim, reduced_zDim,  xDim, yDim, zDim, dev, svf_flag):
+def train_network(trainloader, net, net_seg, para, criterion, optimizer, DistType, RegularityType, weight_dist, weight_reg,  reduced_xDim, reduced_yDim, reduced_zDim,  xDim, yDim, zDim, dev, flag):
     # Training loop
     running_loss = 0
     total = 0
+    fluid_params = [1.0, 0.1, 0.05]
+    lddmm_metirc = lm.FluidMetric(fluid_params)
     print (xDim, yDim, zDim)
     for epoch in range(para.solver.epochs):
         net.train()
@@ -126,9 +128,9 @@ def train_network(trainloader, net, net_seg, para, criterion, optimizer, DistTyp
             binary_map = 1 - union
 
             '''Mask out lesions and run registration'''
-            pred = net(src_bch * binary_map, tar_bch * binary_map, src_bch, binary_map, registration=True, svf = svf_flag)
+            pred = net(src_bch * binary_map, tar_bch * binary_map, src_bch, binary_map, registration=True, shooting = flag)
 
-            if (svf_flag == False):
+            if (flag == "FLDDMM"):
                 momentum = pred[1].permute(0, 4, 3, 2, 1)
                 print (momentum.shape)
                 identity = get_grid2(xDim, dev).permute([0, 4, 3, 2, 1])  
@@ -151,7 +153,7 @@ def train_network(trainloader, net, net_seg, para, criterion, optimizer, DistTyp
                 else:
                     loss_total =  Dist + weight_reg * Reg_loss + dice_loss_total
                 print (dfm.shape)
-            else:
+            elif (flag == "SVF"):
                 Dist = NCC().loss(pred[0], tar_bch * binary_map)   # Stationary velocity fields to shoot forward when svf = True
                 Reg = Grad( penalty= RegularityType)
                 Reg_loss  = Reg.loss(pred[1])
@@ -159,7 +161,17 @@ def train_network(trainloader, net, net_seg, para, criterion, optimizer, DistTyp
                     loss_total = weight_dist * Dist + weight_reg * Reg_loss 
                 else:
                     loss_total = weight_dist * Dist + weight_reg * Reg_loss + dice_loss_total
-
+            elif (flag == "VecMome"):
+                h = lm.expmap(lddmm_metirc, pred[1], num_steps= para.solver.Euler_steps)
+                print (h.shape)
+                Idef = lm.interp(src_bch* binary_map, h)
+                v = lddmm_metirc.sharp(pred[1])
+                reg_term = (v*pred[1]).mean()
+                
+                if epoch <= para.model.pretrain_epoch:
+                    loss_total= (1/(para.solver.Sigma*para.solver.Sigma))*NCC().loss(Idef, tar_bch* binary_map) + reg_term
+                else:
+                    loss_total= (1/(para.solver.Sigma*para.solver.Sigma))*NCC().loss(Idef, tar_bch* binary_map) + reg_term + dice_loss_total
             '''Compute loss'''
             loss_total.backward(retain_graph=True)
             optimizer.step()
@@ -204,7 +216,7 @@ def main():
     trainloader = DataLoader(dataset, batch_size= para.solver.batch_size, shuffle=False)
     net, net_seg, criterion, optimizer = initialize_network_optimizer(xDim, yDim, zDim, para, dev)
     print (len(trainloader))
-    train_network(trainloader, net, net_seg, para, criterion, optimizer, NCC, 'l2', 0.5, 0.5, 16,16,16, xDim, yDim, zDim, dev, True)
+    train_network(trainloader, net, net_seg, para, criterion, optimizer, NCC, 'l2', 0.5, 0.5, 16,16,16, xDim, yDim, zDim, dev, "VecMome")
 
 if __name__ == "__main__":
     main()
