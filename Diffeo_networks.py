@@ -28,17 +28,9 @@ def get_grid2(imagesize, device):
     grid = torch.unsqueeze(grid, 0)
     grid = grid.to(device)
     return grid
-def binarize(output, threshold=0.5):
+def binarize(output, threshold=0.0):
     return (output > threshold).float()
 
-def dice_coefficient(predicted, target):
-
-    intersection = torch.sum(predicted * target, dim=(2, 3, 4))
-    dice = (2. * intersection) / (torch.sum(predicted, dim=(2, 3, 4)) + torch.sum(target, dim=(2, 3, 4)))
-    return dice
-
-def dice_loss(predicted, target):
-    return 1 - dice_coefficient(predicted, target)
 
 class Unet(nn.Module):
 
@@ -229,7 +221,7 @@ class DiffeoDense(LoadableModel):
         # configure transformer
         self.transformer = SpatialTransformer(inshape)
 
-    def forward(self, source, target, original_src, binary_map, registration=False, shooting = None):
+    def forward(self, source, target, src_lbl, binary_map, registration=False, shooting = None):
 
         # concatenate inputs and propagate unet
         x = torch.cat([source, target], dim=1)
@@ -248,7 +240,7 @@ class DiffeoDense(LoadableModel):
         neg_flow = -pos_flow if self.bidir else None
 
         # integrate to produce diffeomorphic warp
-        if (shooting == "svf"):
+        if (shooting == "SVF"):
             if self.integrate:
                 pos_flow = self.integrate(pos_flow)
                 neg_flow = self.integrate(neg_flow) if self.bidir else None
@@ -263,14 +255,12 @@ class DiffeoDense(LoadableModel):
         # warp image with flow field
         pos_flow = pos_flow* binary_map
         y_source = self.transformer(source, pos_flow)
-        def_final = self.transformer(original_src, pos_flow)
-        y_target = self.transformer(target, neg_flow) if self.bidir else None
-
+        y_lbl = self.transformer(src_lbl, pos_flow)
         # return non-integrated flow field if training
         if not registration:
             return (y_source, y_target, preint_flow) if self.bidir else (y_source, preint_flow)
         else:
-            return y_source, pos_flow, def_final
+            return y_source, y_lbl, pos_flow
 
 
 class ConvBlock(nn.Module):

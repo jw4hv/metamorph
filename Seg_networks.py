@@ -213,10 +213,7 @@ class SegDense(LoadableModel):
 
         # configure optional integration layer for diffeomorphic warp
         down_shape = [int(dim / int_downsize) for dim in inshape]
-        self.integrate = VecInt(down_shape, int_steps) if int_steps > 0 else None
-
-        # configure transformer
-        self.transformer = SpatialTransformer(inshape)
+        self.labelize = nn.Sigmoid()
 
     def forward(self, in_vol):
 
@@ -226,6 +223,7 @@ class SegDense(LoadableModel):
         # transform into flow field
         seg_field = self.flow(x)
         seg_field = self.fullsize(seg_field )
+        seg_field = self.labelize(seg_field)
         return seg_field
 
 
