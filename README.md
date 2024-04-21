@@ -43,14 +43,25 @@ The Python version needs be greater than 3.12.
 
   
 ## Usage
-To run training, simply execute the script Train_MetaMorph.py.
+- To run training, execute the script Train_MetaMorph_Reg.py for image registration only. To run joint models, execute the script Train_MetaMorph_joint.py.
+  
+- If you wish to use the spatial version of LDDMM (Lagomorph) to produce geometric features, make sure inlude the source code we provided and also install the `lagomorph` package by:
+
+```bash
+pip install lagomorph
+```
+
+PyTorch version >= 0.4.0 is also required.
 
 ## Documentation
 - The region-based mutual information paper (https://papers.nips.cc/paper_files/paper/2019/hash/a67c8c9a961b4182688768dd9ba015fe-Abstract.html), Region mutual information loss for semantic segmentation. Advances in Neural Information Processing Systems, 2019.
 - Different shooting models we have included are, Stationary Velocity Field in Voxelmorph (Paper: https://arxiv.org/abs/1809.05231, Code: https://github.com/voxelmorph/voxelmorph); Vector-Momenta Shooting Method in Lagomorph (Paper: https://openreview.net/pdf?id=Hkg0j9sA1V, Code: https://github.com/jacobhinkle/lagomorph); LDDMM by Fourier representations (https://bitbucket.org/FlashC/flashc/src).
 
 ## Contributing
-We are seeking collaboration opportunities to explore uncertainty quantification along tumor boundaries and related areas. If interested, please reach out to contribute or discuss further. 
+If you have any questions, feel free to reach out to us by opening an issue. We are seeking collaboration opportunities to explore uncertainty quantification along tumor boundaries. If interested, please reach out to contribute or discuss further. 
+
+## License
+This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file for details.
 
 
 
